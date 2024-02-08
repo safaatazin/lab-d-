@@ -1,0 +1,105 @@
+import java.util.regex.*;
+
+public class AccessLog {
+    private int year;
+    private int month;
+    private int day;
+    private int hour;
+    private int minute;
+    private int second;
+    private String userID;
+    private String doorID;
+    private static final String REGEX = "^(\\d{4})(\\d{2})(\\d{2})\\.(\\d{2})(\\d{2})(\\d{2}) User:(.{4}) Door:(.{3})$";
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
+
+    public AccessLog(String logLine) throws IllegalArgumentException {
+        Matcher match = PATTERN.matcher(logLine);
+        boolean matchFound = match.find();
+        if (matchFound) {
+            this.setYear(Integer.parseInt(match.group(1)));
+            this.setMonth(Integer.parseInt(match.group(2)));
+            this.setDay(Integer.parseInt(match.group(3)));
+            this.setHour(Integer.parseInt(match.group(4)));
+            this.setMinute(Integer.parseInt(match.group(5)));
+            this.setSecond(Integer.parseInt(match.group(6)));
+            this.setUserID(match.group(7));
+            this.setDoorID(match.group(8));
+        } else {
+            throw new IllegalArgumentException("Not a valid logline: " + logLine);
+        }
+    }
+
+    public void setUserID(String id) { this.userID = id; }
+    public void setDoorID(String id) { this.doorID = id; }
+
+    public void setHour(int hour) throws IllegalArgumentException {
+        if (hour >= 0 && hour <= 23) {
+            this.hour = hour;
+        } else {
+            throw new IllegalArgumentException("Not an hour: " + hour);
+        }
+    }
+
+    public void setMinute(int minute) throws IllegalArgumentException {
+        if (minute >= 0 && minute <= 59) {
+            this.minute = minute;
+        } else {
+            throw new IllegalArgumentException("Not a minute: " + minute);
+        }
+    }
+
+    public void setSecond(int second) throws IllegalArgumentException {
+        if (second >= 0 && second <= 59) {
+            this.second = second;
+        } else {
+            throw new IllegalArgumentException("Not a second: " + second);
+        }
+    }
+
+    public void setYear(int year) throws IllegalArgumentException {
+        if (year < 2020) {
+            throw new IllegalArgumentException("Year is too far in the past: " + year);
+        } else if (year > 2050) {
+            throw new IllegalArgumentException("Year is too far in the future: " + year);
+        }
+        this.year = year;
+    }
+
+    public void setMonth(int month) throws IllegalArgumentException {
+        if (month >= 1 && month <= 12) {
+            this.month = month;
+        } else {
+            throw new IllegalArgumentException("Not a valid month: " + month);
+        }
+    }
+
+    public void setDay(int day) throws IllegalArgumentException {
+        if (day < 1 || day > 31) {
+            throw new IllegalArgumentException("Not a valid day: " + day);
+        }
+        if ((this.month == 4 || this.month == 6 || this.month == 9 || this.month == 11) && day > 30) {
+            throw new IllegalArgumentException("Not a valid day: " + day);
+        }
+        if (this.month == 2) {
+            if (day > 29) {
+                throw new IllegalArgumentException("Not a valid day: " + day);
+            }
+            if (day == 29 && !isLeapYear(this.year)) {
+                throw new IllegalArgumentException("Not a valid day: " + day);
+            }
+        }
+        this.day = day;
+    }
+
+    private boolean isLeapYear(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+
+    public String getUserID() { return this.userID; }
+    public String getDoorID() { return this.doorID; }
+    public int getMonth() { return this.month; }
+    public int getDay() { return this.day; }
+    public int getHour() { return this.hour; }
+    public int getMinute() { return this.minute; }
+    public int getSecond() { return this.second; }
+}
